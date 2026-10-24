@@ -1,7 +1,7 @@
 <x-mail::message>
 # Bienvenido(a), {{ $docente->nombres }} {{ $docente->apellidos }}
 
-Se creó tu cuenta en el **Sistema de Gestión de Constancias o Notas ULS**.
+Se creó tu cuenta en el **Sistema de Gestión de Notas ULS**.
 
 <x-mail::panel>
 **Correo:** {{ $email }}
