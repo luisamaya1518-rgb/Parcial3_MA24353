@@ -1,3 +1,6 @@
+Enlace del video con los cambios solicitados:
+https://drive.google.com/file/d/1vq25VoNAEG3n4__lAt4rLlvmizANS6Zl/view?usp=sharing
+
 # Sistema de Gestión de Notas ULS
 
 API RESTful con **Laravel** + SPA con **Vue 3 + Vuetify 3**. Login con 2FA (QR solo la primera vez), registro de docentes con envío de credenciales por correo, registro de notas, informe PDF con visor, exportación Excel/CSV y gráfico de aprobados/reprobados por mes.
