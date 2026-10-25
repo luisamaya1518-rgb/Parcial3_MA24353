@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\User;
@@ -28,34 +29,26 @@ class AuthController extends Controller
             return response()->json(['message' => 'Usuario inhabilitado'], 403);
         }
 
-        // El QR solo se usa la primera vez: si ya confirmó el 2FA, entra directo
-        if ($user->two_factor_confirmed_at) {
-            $token = $user->createToken('access', ['access'])->plainTextToken;
-
-            return response()->json([
-                'token'                => $token,
-                'user'                 => $user->load('docente'),
-                'must_change_password' => (bool) $user->must_change_password,
-                'two_factor_omitido'   => true,
-            ]);
-        }
-
-        // Primer ingreso: token temporal + QR para vincular la app autenticadora
+        // Siempre token temporal: nadie entra solo con la contraseña
         $token = $user->createToken('pre-2fa', ['pre-2fa'], now()->addMinutes(10))->plainTextToken;
+        $response = [
+            'token' => $token,
+            'requires_qr' => !$user->two_factor_confirmed_at,
+        ];
 
-        $google2fa = new Google2FA();
-        if (!$user->two_factor_secret) {
-            $user->two_factor_secret = $google2fa->generateSecretKey();
-            $user->save();
+        // El QR se muestra únicamente mientras el 2FA no esté confirmado
+        if (!$user->two_factor_confirmed_at) {
+            $google2fa = new Google2FA();
+            if (!$user->two_factor_secret) {
+                $user->two_factor_secret = $google2fa->generateSecretKey();
+                $user->save();
+            }
+            $url = $google2fa->getQRCodeUrl(config('app.name'), $user->email, $user->two_factor_secret);
+            $svg = (new Writer(new ImageRenderer(new RendererStyle(220), new SvgImageBackEnd())))->writeString($url);
+            $response['qr'] = 'data:image/svg+xml;base64,' . base64_encode($svg);
         }
-        $url = $google2fa->getQRCodeUrl(config('app.name'), $user->email, $user->two_factor_secret);
-        $svg = (new Writer(new ImageRenderer(new RendererStyle(220), new SvgImageBackEnd())))->writeString($url);
 
-        return response()->json([
-            'token'      => $token,
-            'requires_qr' => true,
-            'qr'         => 'data:image/svg+xml;base64,' . base64_encode($svg),
-        ]);
+        return response()->json($response);
     }
 
     public function verify2fa(Request $request)

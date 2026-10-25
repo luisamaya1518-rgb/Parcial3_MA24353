@@ -37,19 +37,25 @@ const router = createRouter({
           component: () => import('@/views/DocentesView.vue'),
           meta: { title: 'Docentes', roles: ['admin'] },
         },
-                {
+        {
+          path: 'grupos',
+          name: 'grupos',
+          component: () => import('@/views/GruposView.vue'),
+          meta: { title: 'Grupos', roles: ['admin'] },
+        },
+        {
+          path: 'notas/registro',
+          name: 'registro-notas',
+          component: () => import('@/views/RegistroNotasView.vue'),
+          meta: { title: 'Registro de notas', roles: ['admin', 'docente'] },
+        },
+        {
           path: 'notas',
           name: 'notas',
           component: () => import('@/views/NotasView.vue'),
           meta: { title: 'Impresión de notas', roles: ['admin', 'docente'] },
         },
-                {
-          path: 'notas/registro',
-          name: 'notas-registro',
-          component: () => import('@/views/RegistroNotasView.vue'),
-          meta: { title: 'Registro de notas', roles: ['admin', 'docente'] },
-        },
-                {
+        {
           path: 'reportes',
           name: 'reportes',
           component: () => import('@/views/ReportesView.vue'),
@@ -57,7 +63,6 @@ const router = createRouter({
         },
       ],
     },
-    
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
 })

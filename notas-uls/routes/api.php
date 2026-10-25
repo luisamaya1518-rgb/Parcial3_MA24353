@@ -30,6 +30,8 @@ Route::middleware(['auth:sanctum', 'abilities:access'])->group(function () {
         Route::apiResource('estudiantes', EstudianteController::class);
         Route::apiResource('grupos', GrupoController::class);
         Route::post('grupos/{grupo}/estudiantes', [GrupoController::class, 'asignarEstudiantes']);
+        Route::patch('grupos/{grupo}/docente', [GrupoController::class, 'asignarDocente']);
+        Route::get('docentes-lista', [GrupoController::class, 'docentesDisponibles']);
     });
 
     // Admin y docente

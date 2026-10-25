@@ -29,12 +29,8 @@ async function submitCredentials(): Promise<void> {
   if (!result?.valid) return
   loading.value = true
   try {
-    const entroDirecto = await auth.login(email.value, password.value)
-    if (entroDirecto) {
-      router.push('/')    // ya confirmó el 2FA antes: no se pide código
-    } else {
-      step.value = 'code' // primer ingreso: QR + 6 casillas
-    }
+    await auth.login(email.value, password.value)
+    step.value = 'code' // siempre pide el código; el QR aparece solo si auth.qr tiene valor
   } catch (e) {
     error.value = errorMsg(e)
   } finally {
@@ -112,13 +108,12 @@ function back(): void {
                 </v-btn>
               </v-form>
 
-              <a class="sub2 d-inline-block mt-4 text-secondary" href="#">Recupera tu contraseña</a>
               <p class="sub2 mt-6 text-medium-emphasis">
                 Gestión y administración de Constancias o Notas ULS.
               </p>
             </template>
 
-            <!-- PASO 2: código 2FA (con QR la primera vez) -->
+            <!-- PASO 2: código de verificación (con QR solo la primera vez) -->
             <template v-else>
               <v-sheet color="#E1E5F2" rounded="lg" class="pa-6 mt-4">
                 <template v-if="auth.qr">
@@ -149,6 +144,7 @@ function back(): void {
 
 <style scoped>
 .login-bg {
+  width: 100%;
   min-height: 100vh;
   background: radial-gradient(circle at 20% 20%, #0f4c5c 0%, #07151f 55%, #02060a 100%);
 }

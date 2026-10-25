@@ -13,7 +13,7 @@ return new class extends Migration
             $table->string('nombre');
             $table->foreignId('ciclo_id')->constrained()->cascadeOnDelete();
             $table->foreignId('materia_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('docente_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('docente_id')->nullable()->constrained()->nullOnDelete();
             $table->timestamps();
         });
     }

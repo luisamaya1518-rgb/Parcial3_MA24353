@@ -1,82 +1,47 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="utf-8">
-    <title>Notas del grupo {{ $grupo->nombre }}</title>
-    <style>
-        body { font-family: DejaVu Sans, sans-serif; font-size: 11px; color: #313945; }
-        h1 { font-size: 18px; color: #2D52A8; margin: 0 0 4px 0; }
-        h2 { font-size: 13px; margin: 0 0 12px 0; font-weight: normal; }
-        .info { width: 100%; margin-bottom: 12px; border-collapse: collapse; }
-        .info td { padding: 2px 4px; font-size: 10px; }
-        table.notas { width: 100%; border-collapse: collapse; }
-        table.notas th { background: #2D52A8; color: #fff; padding: 6px; font-size: 10px; text-align: left; }
-        table.notas td { border-bottom: 1px solid #ddd; padding: 5px 6px; }
-        .c { text-align: center; }
-        .aprobado { color: #1f9d6a; font-weight: bold; }
-        .reprobado { color: #EF5350; font-weight: bold; }
-        .pie { margin-top: 14px; font-size: 9px; color: #777; }
-    </style>
+<meta charset="utf-8">
+<style>
+  body { font-family: DejaVu Sans, sans-serif; font-size: 11px; color: #313945; }
+  h1 { font-size: 16px; color: #2D52A8; margin-bottom: 4px; }
+  .info td { padding: 2px 8px 2px 0; }
+  table.notas { width: 100%; border-collapse: collapse; margin-top: 14px; }
+  table.notas th { background: #2D52A8; color: #fff; padding: 6px; text-align: left; }
+  table.notas td { padding: 5px 6px; border-bottom: 1px solid #ddd; }
+  .ap { color: #2e9e6b; font-weight: bold; }
+  .rp { color: #EF5350; font-weight: bold; }
+  .pie { margin-top: 16px; font-size: 9px; color: #777; }
+</style>
 </head>
 <body>
-    <h1>Universidad Luterana Salvadoreña</h1>
-    <h2>Cuadro de notas - {{ $grupo->materia->nombre ?? '' }}</h2>
+  <h1>Cuadro de notas - {{ $grupo->materia->nombre }}</h1>
+  <table class="info">
+    <tr><td><b>Institución:</b></td><td>Universidad Luterana Salvadoreña</td></tr>
+    <tr><td><b>Ciclo:</b></td><td>{{ $grupo->ciclo->nombre }}</td></tr>
+    <tr><td><b>Grupo:</b></td><td>{{ $grupo->nombre }}</td></tr>
+    <tr><td><b>Docente:</b></td><td>{{ $grupo->docente ? $grupo->docente->nombres . ' ' . $grupo->docente->apellidos : 'Sin asignar' }}</td></tr>
+  </table>
 
-    <table class="info">
+  <table class="notas">
+    <thead>
+      <tr><th>Carnet</th><th>Estudiante</th><th>Nota 1</th><th>Nota 2</th><th>Nota 3</th><th>Promedio</th><th>Estado</th></tr>
+    </thead>
+    <tbody>
+      @foreach ($filas as $f)
         <tr>
-            <td><strong>Grupo:</strong> {{ $grupo->nombre }}</td>
-            <td><strong>Ciclo:</strong> {{ $grupo->ciclo->nombre ?? '' }}</td>
+          <td>{{ $f['carnet'] }}</td>
+          <td>{{ $f['estudiante'] }}</td>
+          <td>{{ $f['nota1'] }}</td>
+          <td>{{ $f['nota2'] }}</td>
+          <td>{{ $f['nota3'] }}</td>
+          <td><b>{{ $f['promedio'] }}</b></td>
+          <td class="{{ $f['estado'] === 'Aprobado' ? 'ap' : ($f['estado'] === 'Reprobado' ? 'rp' : '') }}">{{ $f['estado'] }}</td>
         </tr>
-        <tr>
-            <td><strong>Docente:</strong> {{ ($grupo->docente->nombres ?? '') . ' ' . ($grupo->docente->apellidos ?? '') }}</td>
-            <td><strong>Periodo:</strong>
-                @if($grupo->ciclo)
-                    {{ \Carbon\Carbon::parse($grupo->ciclo->fecha_inicio)->format('d/m/Y') }}
-                    al
-                    {{ \Carbon\Carbon::parse($grupo->ciclo->fecha_fin)->format('d/m/Y') }}
-                @endif
-            </td>
-        </tr>
-        <tr>
-            <td><strong>Generado por:</strong> {{ $usuario }}</td>
-            <td><strong>Fecha y hora:</strong> {{ $fecha }}</td>
-        </tr>
-        <tr>
-            <td colspan="2"><strong>Total de registros:</strong> {{ count($filas) }}</td>
-        </tr>
-    </table>
+      @endforeach
+    </tbody>
+  </table>
 
-    <table class="notas">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Carnet</th>
-                <th>Estudiante</th>
-                <th class="c">Nota 1</th>
-                <th class="c">Nota 2</th>
-                <th class="c">Nota 3</th>
-                <th class="c">Promedio</th>
-                <th class="c">Estado</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($filas as $i => $f)
-                <tr>
-                    <td>{{ $i + 1 }}</td>
-                    <td>{{ $f['carnet'] }}</td>
-                    <td>{{ $f['estudiante'] }}</td>
-                    <td class="c">{{ $f['nota1'] }}</td>
-                    <td class="c">{{ $f['nota2'] }}</td>
-                    <td class="c">{{ $f['nota3'] }}</td>
-                    <td class="c">{{ $f['promedio'] }}</td>
-                    <td class="c {{ strtolower($f['estado']) }}">{{ $f['estado'] }}</td>
-                </tr>
-            @empty
-                <tr><td colspan="8" class="c">Este grupo no tiene estudiantes.</td></tr>
-            @endforelse
-        </tbody>
-    </table>
-
-    <div class="pie">Aprobado con promedio de 6.0 o más.</div>
+  <p class="pie">Generado por {{ $usuario }} el {{ $fecha }} | Registros: {{ count($filas) }}</p>
 </body>
 </html>
